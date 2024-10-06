@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "sleuth",
+  "version": "1.0",
+  "description": "Monitor network requests made by Chrome extensions",
+  "permissions": [
+    "management",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html"
+  }
+}
