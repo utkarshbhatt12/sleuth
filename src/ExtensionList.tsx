@@ -1,16 +1,6 @@
 import { Accordion } from '@/components/ui/accordion';
 import ExtensionItem from './ExtensionItem';
-
-interface Extension {
-  id: string;
-  name: string;
-  networkRequests: number;
-  urls: { [key: string]: number };
-}
-
-interface ExtensionListProps {
-  extensions: Extension[];
-}
+import { ExtensionListProps } from './types';
 
 export default function ExtensionList({ extensions }: ExtensionListProps) {
   return (

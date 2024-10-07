@@ -3,25 +3,25 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
-
-interface Extension {
-  id: string;
-  name: string;
-  networkRequests: number;
-  urls: { [key: string]: number };
-}
-
-interface ExtensionItemProps {
-  extension: Extension;
-}
+import { ExtensionItemProps } from './types';
 
 export default function ExtensionItem({ extension }: ExtensionItemProps) {
+  const formatTime = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString();
+  };
+
   return (
     <AccordionItem value={extension.id} className="border-b">
       <AccordionTrigger className="hover:no-underline py-2">
         <div className="flex justify-between w-full items-center">
           <span className="font-medium">{extension.name}</span>
-          <span className="text-sm">{extension.networkRequests} requests</span>
+          <div className="text-sm text-right">
+            <div>{extension.networkRequests} requests</div>
+            <div className="text-xs text-gray-500">
+              Last: {formatTime(extension.lastRequestTime)}
+            </div>
+          </div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="py-1">

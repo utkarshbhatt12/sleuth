@@ -2,14 +2,9 @@ import { useState, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Activity } from 'lucide-react';
 import ExtensionList from './ExtensionList';
-
-interface Extension {
-  id: string;
-  name: string;
-  networkRequests: number;
-  urls: { [key: string]: number };
-}
+import { Extension } from './types';
 
 export default function Popup() {
   const [extensions, setExtensions] = useState<Extension[]>([]);
@@ -28,14 +23,20 @@ export default function Popup() {
           if (chrome.runtime.lastError) {
             setError(`Error: ${chrome.runtime.lastError.message}`);
           } else {
-            setExtensions(response.extensions);
+            const sortedExtensions = response.extensions
+              .filter((ext: Extension) => ext.networkRequests > 0)
+              .sort(
+                (a: Extension, b: Extension) =>
+                  b.lastRequestTime - a.lastRequestTime
+              );
+            setExtensions(sortedExtensions);
             setTotalRequests(response.totalRequests);
           }
         }
       );
     } else {
       // Fallback for development environment
-      setExtensions([
+      const mockExtensions: Extension[] = [
         {
           id: '1',
           name: 'Sample Extension 1',
@@ -44,6 +45,7 @@ export default function Popup() {
             'https://example.com/api/data': 5,
             'https://api.example.com/users': 5,
           },
+          lastRequestTime: Date.now() - 5000,
         },
         {
           id: '2',
@@ -53,8 +55,12 @@ export default function Popup() {
             'https://google.com/search': 10,
             'https://api.github.com/repos': 10,
           },
+          lastRequestTime: Date.now() - 1000,
         },
-      ]);
+      ];
+      setExtensions(
+        mockExtensions.sort((a, b) => b.lastRequestTime - a.lastRequestTime)
+      );
       setTotalRequests(30);
     }
   };
@@ -97,10 +103,18 @@ export default function Popup() {
       <main className="flex-1 overflow-hidden p-2">
         {error ? (
           <div className="text-red-500 mb-2">{error}</div>
-        ) : (
+        ) : extensions.length > 0 ? (
           <ScrollArea className="h-full">
             <ExtensionList extensions={extensions} />
           </ScrollArea>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-gray-500">
+            <Activity size={64} className="mb-4" />
+            <p className="text-center">No network activity detected yet.</p>
+            <p className="text-center text-sm mt-2">
+              Use Chrome normally and check back later!
+            </p>
+          </div>
         )}
       </main>
     </div>
